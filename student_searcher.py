@@ -174,13 +174,16 @@ def load_students(filename="students.txt"):
     students = []
     try:
         with open(filename, 'r') as file:
+            print("Reading students.txt")
             for line in file:
                 # Skip empty lines
                 if not line.strip():
                     continue
+                print("Processing line:", line.strip())
                 try:
                     # Split the line into name and grades
                     name, grades_str = line.strip().split(": ", 1)
+                    print("Name:", name, "Grades string:", grades_str)
                     # Remove brackets and split grades
                     grades_str = grades_str.strip("[]")
                     # Split grades and filter out empty strings
@@ -196,6 +199,7 @@ def load_students(filename="students.txt"):
         print("File not found. Starting with an empty student list.")
     except IOError:
         print("Error: Could not read from file.")
+    print("Final students list:", students)
     return students
 
 # Main program with a menu
