@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+frontend/student-searcher-frontend/node_modules/
+frontend/student-searcher-frontend/build/

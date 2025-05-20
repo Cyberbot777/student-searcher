@@ -1,18 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import StudentList from '../components/StudentList';
 
 const Home = () => {
-  // Mock data to test the table
-  const mockStudents = [
-    { name: "Richard", grades: [85, 90, 95, 88] },
-    { name: "Alice", grades: [90, 85, 92, 84] },
-    { name: "Mike", grades: [99, 86, 90] }
-  ];
+  const [students, setStudents] = useState([]);
+  const [error, setError] = useState('');
+
+  const fetchStudents = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/students');
+      setStudents(response.data);
+    } catch (err) {
+      setError('Error fetching students.');
+    }
+  };
+
+  useEffect(() => {
+    fetchStudents();
+  }, []);
 
   return (
     <div>
       <h2>All Students</h2>
-      {mockStudents.length > 0 ? <StudentList students={mockStudents} /> : <p>No students found.</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {students.length > 0 ? <StudentList students={students} /> : <p>No students found.</p>}
     </div>
   );
 };
