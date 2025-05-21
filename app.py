@@ -29,8 +29,8 @@ def get_students():
 @app.route('/students', methods=['POST'])
 def add_student():
     data = request.json
-    name = data.get('name')
-    grades = data.get('grades')
+    name = data.get('name') # type: ignore
+    grades = data.get('grades') # type: ignore
     try:
         student_searcher.add_student(students, name, grades)
         student_searcher.save_students(students)
@@ -44,7 +44,7 @@ def add_student():
 @app.route('/students/<name>', methods=['PUT'])
 def edit_student(name):
     data = request.json
-    grades = data.get('grades')
+    grades = data.get('grades') # type: ignore
     student = student_searcher.search_student(students, name)
     if student:
         try:
@@ -84,13 +84,21 @@ def search_by_partial_name(partial_name):
 
 @app.route('/search/average', methods=['GET'])
 def search_by_average():
+    min_avg = request.args.get('min_avg')
+    max_avg = request.args.get('max_avg')
+    if min_avg is None or max_avg is None:
+        return jsonify({"error": "Missing min_avg or max_avg parameters."}), 400
     try:
-        min_avg = float(request.args.get('min_avg'))
-        max_avg = float(request.args.get('max_avg'))
+        min_avg = float(min_avg)
+        max_avg = float(max_avg)
+        if min_avg > max_avg:
+            return jsonify({"error": "min_avg cannot be greater than max_avg."}), 400
         results = student_searcher.search_students_by_average(students, min_avg, max_avg)
         return jsonify(results)
     except ValueError:
-        return jsonify({"error": "Invalid average range."}), 400
+        return jsonify({"error": "Invalid average range: must be numbers."}), 400
+    except Exception as e:
+        return jsonify({"error": f"Error processing request: {str(e)}"}), 500
 
 @app.route('/statistics', methods=['GET'])
 def get_statistics():
