@@ -7,6 +7,10 @@ from shutil import copyfile
 app = Flask(__name__)
 CORS(app)
 
+@app.route('/', methods=['GET', 'HEAD'])
+def health_check():
+    return jsonify({"status": "ok", "message": "Student Searcher Backend is running"}), 200
+
 try:
     if not os.path.exists('/opt/render/students.txt'):
         if os.path.exists('students.txt'):
