@@ -6,6 +6,13 @@ app = Flask(__name__)
 CORS(app)
 
 try:
+    if not os.path.exists('/opt/render/students.txt'):
+        if os.path.exists('students.txt'):
+            copyfile('students.txt', '/opt/render/students.txt')
+except Exception as e:
+    print(f"Error copying students.txt: {str(e)}")
+
+try:
     students = student_searcher.load_students()
     print("Loaded students:", students)
 except Exception as e:

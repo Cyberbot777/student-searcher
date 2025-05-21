@@ -161,7 +161,7 @@ def display_statistics(students):
     print(f"Lowest Average: {lowest_avg:.2f} (Student: {lowest_student})")
 
 # Function to save students to a file (menu option 12)
-def save_students(students, filename="students.txt"):
+def save_students(students, filename="/opt/render/students.txt"):
     try:
         with open(filename, 'w') as file:
             for student in students:
@@ -170,25 +170,17 @@ def save_students(students, filename="students.txt"):
         print("Error: Could not save to file.")
 
 # Function to load students from a file
-def load_students(filename="students.txt"):
+def load_students(filename="/opt/render/students.txt"):
     students = []
     try:
         with open(filename, 'r') as file:
-            print("Reading students.txt")
             for line in file:
-                # Skip empty lines
                 if not line.strip():
                     continue
-                print("Processing line:", line.strip())
                 try:
-                    # Split the line into name and grades
                     name, grades_str = line.strip().split(": ", 1)
-                    print("Name:", name, "Grades string:", grades_str)
-                    # Remove brackets and split grades
                     grades_str = grades_str.strip("[]")
-                    # Split grades and filter out empty strings
                     grade_strings = [g for g in grades_str.split(", ") if g]
-                    # Convert to integers
                     grades = [int(g) for g in grade_strings]
                     add_student(students, name, grades)
                 except ValueError as e:
@@ -199,7 +191,6 @@ def load_students(filename="students.txt"):
         print("File not found. Starting with an empty student list.")
     except IOError:
         print("Error: Could not read from file.")
-    print("Final students list:", students)
     return students
 
 # Main program with a menu
