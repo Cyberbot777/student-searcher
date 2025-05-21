@@ -17,17 +17,17 @@ const Search = () => {
     try {
       let response;
       if (searchType === 'exact') {
-        response = await axios.get(`http://localhost:5000/search/name/${name}`);
+        response = await axios.get(`https://student-searcher-backend.onrender.com/search/name/${name}`);
         setResults(response.data.error ? [] : [response.data]);
       } else if (searchType === 'partial') {
-        response = await axios.get(`http://localhost:5000/search/partial/${partialName}`);
+        response = await axios.get(`https://student-searcher-backend.onrender.com/search/partial/${partialName}`);
         setResults(response.data);
       } else {
         if (minAvg && maxAvg && Number(minAvg) > Number(maxAvg)) {
           setError('Minimum average cannot be greater than maximum.');
           return;
         }
-        response = await axios.get(`http://localhost:5000/search/average?min_avg=${minAvg}&max_avg=${maxAvg}`);
+        response = await axios.get(`https://student-searcher-backend.onrender.com/search/average?min_avg=${minAvg}&max_avg=${maxAvg}`);
         setResults(response.data);
       }
     } catch (err) {

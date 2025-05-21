@@ -13,7 +13,7 @@ const Manage = () => {
 
   const fetchStudents = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/students');
+      const response = await axios.get('https://student-searcher-backend.onrender.com/students');
       setStudents(response.data);
     } catch (err) {
       setError('Error fetching students.');
@@ -34,7 +34,7 @@ const Manage = () => {
         setError('Grades must be numbers between 0 and 100.');
         return;
       }
-      await axios.post('http://localhost:5000/students', { name, grades: gradesArray });
+      await axios.post('https://student-searcher-backend.onrender.com/students', { name, grades: gradesArray });
       setMessage('Student added successfully!');
       setName('');
       setGrades('');
@@ -54,7 +54,7 @@ const Manage = () => {
         setError('Grades must be numbers between 0 and 100.');
         return;
       }
-      await axios.put(`http://localhost:5000/students/${editName}`, { grades: gradesArray });
+      await axios.put(`https://student-searcher-backend.onrender.com/students/${editName}`, { grades: gradesArray });
       setMessage('Grades updated successfully!');
       setEditName('');
       setEditGrades('');
@@ -67,7 +67,7 @@ const Manage = () => {
   const handleRemove = async (name) => {
     if (window.confirm(`Are you sure you want to remove ${name}?`)) {
       try {
-        await axios.delete(`http://localhost:5000/students/${name}`);
+        await axios.delete(`https://student-searcher-backend.onrender.com/students/${name}`);
         setMessage(`Removed ${name} successfully!`);
         fetchStudents();
       } catch (err) {

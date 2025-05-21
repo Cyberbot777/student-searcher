@@ -8,7 +8,7 @@ const Stats = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/statistics');
+        const response = await axios.get('https://student-searcher-backend.onrender.com/statistics');
         setStats(response.data);
       } catch (err) {
         setError('Error fetching statistics.');
