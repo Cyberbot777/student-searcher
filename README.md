@@ -1,5 +1,7 @@
 # Student Searcher
 
+**View Live Demo: [https://student-searcher.vercel.app/](https://student-searcher.vercel.app/)**
+
 ## Overview
 `Student Searcher` is a full-stack web application for managing student records. Originally a Python-based command-line tool, it has been enhanced with a Flask backend and a React frontend, deployed on Render and Vercel. Users can view, search, manage, and analyze student data through an intuitive web interface, with data persisted in a text file (`students.txt`).
 
@@ -34,7 +36,7 @@
 
 ## Usage Instructions
 1. **Access the Web App**:
-   - Visit `https://student-searcher.vercel.app/` in a browser.
+   - Visit **View Live Demo: [https://student-searcher.vercel.app/](https://student-searcher.vercel.app/)** in a browser.
    - Navigate using the menu:
      - **Home**: View all students.
      - **Search**: Search by name (exact or partial) or grade range.
