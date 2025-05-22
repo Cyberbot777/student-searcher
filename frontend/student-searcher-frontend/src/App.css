@@ -12,7 +12,7 @@ body {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.nav-link {
+.nav-link, .navbar-brand {
   color: #ffffff !important;
   transition: color 0.3s ease, transform 0.2s ease;
 }
@@ -26,6 +26,14 @@ body {
   color: #4dabf7 !important;
   font-weight: 700;
   border-bottom: 2px solid #4dabf7;
+}
+
+.navbar-toggler {
+  border-color: #ffffff !important; /* White outline for hamburger */
+}
+
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important; /* White lines */
 }
 
 /* Headings */
