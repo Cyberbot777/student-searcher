@@ -119,7 +119,7 @@ const Manage = () => {
         <input
           type="text"
           value={grades}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => setGrades(e.target.value)}
           placeholder="Grades (e.g., 80,85,90)"
           required
         />
