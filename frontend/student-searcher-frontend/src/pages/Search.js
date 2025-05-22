@@ -85,6 +85,8 @@ const Search = () => {
               value={minAvg}
               onChange={(e) => setMinAvg(e.target.value)}
               placeholder="Min average"
+              min="0"
+              max="100"
               required
             />
             <input
@@ -92,6 +94,8 @@ const Search = () => {
               value={maxAvg}
               onChange={(e) => setMaxAvg(e.target.value)}
               placeholder="Max average"
+              min="0"
+              max="100"
               required
             />
           </>
