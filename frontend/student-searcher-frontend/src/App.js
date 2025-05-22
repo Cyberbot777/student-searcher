@@ -1,5 +1,6 @@
 // Main Application Component
-// Sets up routing and navigation with React Bootstrap Navbar.
+// Sets up routing and navigation with styled Navbar.
+
 import { BrowserRouter as Router, Route, Routes, NavLink } from "react-router-dom";
 import { Navbar, Nav, Container } from "react-bootstrap";
 import Home from "./pages/Home";

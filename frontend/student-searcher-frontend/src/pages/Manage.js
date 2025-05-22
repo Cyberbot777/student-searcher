@@ -1,3 +1,6 @@
+// Manage Students Page Component
+// Allows adding, editing, and removing students with styled forms.
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import StudentList from '../components/StudentList';
@@ -14,7 +17,7 @@ const Manage = () => {
 
   const fetchStudents = async () => {
     try {
-      const response = await axios.get('https://student-searcher-backend.onrender.com/students');
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/students`);
       setStudents(response.data);
     } catch (err) {
       setError('Error fetching students.');
@@ -35,7 +38,7 @@ const Manage = () => {
         setError('Grades must be numbers between 0 and 100.');
         return;
       }
-      await axios.post('https://student-searcher-backend.onrender.com/students', { name, grades: gradesArray });
+      await axios.post(`${process.env.REACT_APP_API_URL}/students`, { name, grades: gradesArray });
       setMessage('Student added successfully!');
       setName('');
       setGrades('');
@@ -55,7 +58,7 @@ const Manage = () => {
         setError('Grades must be numbers between 0 and 100.');
         return;
       }
-      await axios.put(`https://student-searcher-backend.onrender.com/students/${editName}`, { grades: gradesArray });
+      await axios.put(`${process.env.REACT_APP_API_URL}/students/${editName}`, { grades: gradesArray });
       setMessage('Grades updated successfully!');
       setEditName('');
       setEditGrades('');
@@ -68,7 +71,7 @@ const Manage = () => {
   const handleRemove = async (name) => {
     if (window.confirm(`Are you sure you want to remove ${name}?`)) {
       try {
-        await axios.delete(`https://student-searcher-backend.onrender.com/students/${name}`);
+        await axios.delete(`${process.env.REACT_APP_API_URL}/students/${name}`);
         setMessage(`Removed ${name} successfully!`);
         fetchStudents();
       } catch (err) {

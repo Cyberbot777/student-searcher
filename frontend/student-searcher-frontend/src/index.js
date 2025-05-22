@@ -1,3 +1,6 @@
+// Entry Point for Student Searcher Frontend
+// Initializes the React app with Bootstrap styling.
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';

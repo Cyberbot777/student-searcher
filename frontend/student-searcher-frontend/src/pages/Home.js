@@ -12,7 +12,7 @@ const Home = () => {
 
   const fetchStudents = async () => {
     try {
-      const response = await axios.get('https://student-searcher-backend.onrender.com/students');
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/students`);
       setStudents(response.data);
     } catch (err) {
       setError('Error fetching students.');

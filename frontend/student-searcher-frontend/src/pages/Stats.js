@@ -1,3 +1,6 @@
+// Class Statistics Page Component
+// Displays class metrics in a styled card.
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Container, Card, Alert } from 'react-bootstrap';
@@ -9,7 +12,7 @@ const Stats = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await axios.get('https://student-searcher-backend.onrender.com/statistics');
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/statistics`);
         setStats(response.data);
       } catch (err) {
         setError('Error fetching statistics.');
