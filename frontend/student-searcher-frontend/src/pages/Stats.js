@@ -1,50 +1,41 @@
 // Class Statistics Page Component
-// This component fetches and displays class-wide statistics from the backend.
+// Displays class metrics in a styled card.
 
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Container, Card, Alert } from 'react-bootstrap';
 
-// Stats page component
 const Stats = () => {
   const [stats, setStats] = useState(null);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  // Fetch statistics from backend
   useEffect(() => {
     const fetchStats = async () => {
-      setLoading(true);
       try {
-        const response = await axios.get("https://student-searcher-backend.onrender.com/statistics");
+        const response = await axios.get('https://student-searcher-backend.onrender.com/statistics');
         setStats(response.data);
-        setError("");
       } catch (err) {
-        setError(err.response?.data?.error || "Error fetching statistics.");
-      } finally {
-        setLoading(false);
+        setError('Error fetching statistics.');
       }
     };
     fetchStats();
   }, []);
 
-  // Render loading, error, or statistics
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p className="error">{error}</p>;
-  if (!stats) return <p>No statistics available.</p>;
+  if (error) return <Alert variant="danger">{error}</Alert>;
+  if (!stats) return <p>Loading...</p>;
 
   return (
-    <div>
-      <h2>Class Statistics</h2>
-      <p>Class Average: {stats.class_average.toFixed(2)}</p>
-      <p>
-        Highest Average: {stats.highest_average.toFixed(2)} (Student:{" "}
-        {stats.highest_student})
-      </p>
-      <p>
-        Lowest Average: {stats.lowest_average.toFixed(2)} (Student:{" "}
-        {stats.lowest_student})
-      </p>
-    </div>
+    <Container>
+      <h2 className="my-4">Class Statistics</h2>
+      <Card className="shadow-sm">
+        <Card.Body>
+          <Card.Title>Class Metrics</Card.Title>
+          <p>Class Average: {stats.class_average.toFixed(2)}</p>
+          <p>Highest Average: {stats.highest_average.toFixed(2)} (Student: {stats.highest_student})</p>
+          <p>Lowest Average: {stats.lowest_average.toFixed(2)} (Student: {stats.lowest_student})</p>
+        </Card.Body>
+      </Card>
+    </Container>
   );
 };
 

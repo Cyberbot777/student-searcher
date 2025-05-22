@@ -1,6 +1,10 @@
+// Search Students Page Component
+// Allows searching students with styled form inputs.
+
 import React, { useState } from 'react';
 import axios from 'axios';
 import StudentList from '../components/StudentList';
+import { Container, Form, Button } from 'react-bootstrap';
 
 const Search = () => {
   const [searchType, setSearchType] = useState('exact');
@@ -36,35 +40,41 @@ const Search = () => {
   };
 
   return (
-    <div>
-      <h2>Search Students</h2>
-      <form onSubmit={handleSearch}>
-        <select value={searchType} onChange={(e) => setSearchType(e.target.value)}>
-          <option value="exact">Exact Name</option>
-          <option value="partial">Partial Name</option>
-          <option value="average">Average Grade Range</option>
-        </select>
+    <Container>
+      <h2 className="my-4">Search Students</h2>
+      <Form onSubmit={handleSearch}>
+        <Form.Group className="mb-3">
+          <Form.Select value={searchType} onChange={(e) => setSearchType(e.target.value)}>
+            <option value="exact">Exact Name</option>
+            <option value="partial">Partial Name</option>
+            <option value="average">Average Grade Range</option>
+          </Form.Select>
+        </Form.Group>
         {searchType === 'exact' && (
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Enter exact name"
-            required
-          />
+          <Form.Group className="mb-3">
+            <Form.Control
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter exact name"
+              required
+            />
+          </Form.Group>
         )}
         {searchType === 'partial' && (
-          <input
-            type="text"
-            value={partialName}
-            onChange={(e) => setPartialName(e.target.value)}
-            placeholder="Enter partial name"
-            required
-          />
+          <Form.Group className="mb-3">
+            <Form.Control
+              type="text"
+              value={partialName}
+              onChange={(e) => setPartialName(e.target.value)}
+              placeholder="Enter partial name"
+              required
+            />
+          </Form.Group>
         )}
         {searchType === 'average' && (
-          <>
-            <input
+          <div className="d-flex gap-3 mb-3">
+            <Form.Control
               type="number"
               value={minAvg}
               onChange={(e) => setMinAvg(e.target.value)}
@@ -73,7 +83,7 @@ const Search = () => {
               max="100"
               required
             />
-            <input
+            <Form.Control
               type="number"
               value={maxAvg}
               onChange={(e) => setMaxAvg(e.target.value)}
@@ -82,13 +92,13 @@ const Search = () => {
               max="100"
               required
             />
-          </>
+          </div>
         )}
-        <button type="submit">Search</button>
-      </form>
+        <Button type="submit" variant="primary">Search</Button>
+      </Form>
       {error && <p style={{ color: 'red' }}>{error}</p>}
       {results.length > 0 && <StudentList students={results} />}
-    </div>
+    </Container>
   );
 };
 

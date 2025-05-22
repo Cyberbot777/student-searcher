@@ -1,74 +1,67 @@
-/* Main Stylesheet for Student Searcher Frontend */
-/* This file defines global styles for the React frontend, including layout and navigation. */
+/* Custom Styles for Student Searcher Frontend */
 
-.App {
-  text-align: center;
+/* General */
+body {
+  background-color: #f8f9fa;
 }
 
-/* Navigation styles */
-.nav {
-  margin-bottom: 20px;
+/* Navbar */
+.navbar {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.nav-list {
-  list-style: none;
-  display: flex;
-  gap: 20px;
-  padding: 0;
+.nav-link {
+  transition: color 0.3s;
 }
 
-/* Message styles */
-.error {
-  color: red;
+.nav-link:hover {
+  color: #0d6efd !important;
 }
 
-.success {
-  color: green;
+.nav-link.active {
+  font-weight: bold;
+  color: #0d6efd !important;
 }
 
-/* Table styles for StudentList */
-.student-table {
-  width: 100%;
-  border-collapse: collapse;
+/* Headings */
+h2, h3 {
+  color: #343a40;
 }
 
-.student-table-cell {
-  border: 1px solid #ddd;
-  padding: 8px;
+/* Table */
+.table {
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-/* Boilerplate styles (may be used by other components) */
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Card */
+.card {
+  border: none;
+  background-color: white;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+/* Forms */
+.form-control, .form-select {
+  border-radius: 0.25rem;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+/* Buttons */
+.btn-primary {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
 }
 
-.App-link {
-  color: #61dafb;
+.btn-primary:hover {
+  background-color: #0b5ed7;
+  border-color: #0a58ca;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.btn-danger {
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+  border-color: #bd2130;
 }

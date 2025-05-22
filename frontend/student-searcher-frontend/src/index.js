@@ -1,21 +1,18 @@
 // Entry Point for Student Searcher Frontend
-// This file initializes the React app, rendering the App component and setting up performance monitoring.
+// Initializes the React app with Bootstrap styling.
 
-import React from "react";
-import ReactDOM from "react-dom/client";
-import "./index.css";
-import App from "./App";
-import reportWebVitals from "./reportWebVitals";
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import './index.css';
+import App from './App';
+import reportWebVitals from './reportWebVitals';
+import 'bootstrap/dist/css/bootstrap.min.css'; // Bootstrap CSS
 
-// Initialize root element
-const root = ReactDOM.createRoot(document.getElementById("root"));
-
-// Render App in strict mode
+const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <App />
   </React.StrictMode>
 );
 
-// Performance monitoring (optional, logs to console or analytics)
 reportWebVitals();
