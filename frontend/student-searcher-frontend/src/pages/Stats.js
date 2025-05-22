@@ -1,6 +1,3 @@
-// Class Statistics Page Component
-// Displays class metrics in a styled card.
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Container, Card, Alert } from 'react-bootstrap';

@@ -1,6 +1,3 @@
-// Manage Students Page Component
-// Allows adding, editing, and removing students with styled forms.
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import StudentList from '../components/StudentList';

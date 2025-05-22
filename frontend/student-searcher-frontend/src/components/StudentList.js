@@ -1,6 +1,3 @@
-// Student List Component
-// Renders a styled table of student data.
-
 import React from 'react';
 import { Table } from 'react-bootstrap';
 

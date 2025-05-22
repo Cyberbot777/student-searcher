@@ -1,6 +1,3 @@
-// Search Students Page Component
-// Allows searching students with styled form inputs.
-
 import React, { useState } from 'react';
 import axios from 'axios';
 import StudentList from '../components/StudentList';

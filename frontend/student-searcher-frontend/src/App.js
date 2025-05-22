@@ -1,6 +1,5 @@
 // Main Application Component
 // Sets up routing and navigation with React Bootstrap Navbar.
-
 import { BrowserRouter as Router, Route, Routes, NavLink } from "react-router-dom";
 import { Navbar, Nav, Container } from "react-bootstrap";
 import Home from "./pages/Home";
@@ -12,7 +11,7 @@ import "./App.css";
 function App() {
   return (
     <Router>
-      <Navbar bg="dark" variant="dark" expand="lg" className="mb-4">
+      <Navbar expand="lg" className="navbar-custom mb-4">
         <Container>
           <Navbar.Brand href="/">Student Searcher</Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
