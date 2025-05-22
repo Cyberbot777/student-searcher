@@ -10,15 +10,12 @@ const Stats = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Base API URL for local or deployed backend
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
-
   // Fetch statistics from backend
   useEffect(() => {
     const fetchStats = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`${API_URL}/statistics`);
+        const response = await axios.get("https://student-searcher-backend.onrender.com/statistics");
         setStats(response.data);
         setError("");
       } catch (err) {

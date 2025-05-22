@@ -16,14 +16,11 @@ const Manage = () => {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Base API URL for local or deployed backend
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
-
   // Fetch students from backend
   const fetchStudents = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${API_URL}/students`);
+      const response = await axios.get("https://student-searcher-backend.onrender.com/students");
       setStudents(response.data);
       setError("");
     } catch (err) {
@@ -50,7 +47,7 @@ const Manage = () => {
         setError("Grades must be numbers between 0 and 100.");
         return;
       }
-      await axios.post(`${API_URL}/students`, { name, grades: gradesArray });
+      await axios.post("https://student-searcher-backend.onrender.com/students", { name, grades: gradesArray });
       setMessage("Student added successfully!");
       setName("");
       setGrades("");
@@ -74,7 +71,7 @@ const Manage = () => {
         setError("Grades must be numbers between 0 and 100.");
         return;
       }
-      await axios.put(`${API_URL}/students/${editName}`, {
+      await axios.put(`https://student-searcher-backend.onrender.com/students/${editName}`, {
         grades: gradesArray,
       });
       setMessage("Grades updated successfully!");
@@ -95,7 +92,7 @@ const Manage = () => {
       setMessage("");
       setLoading(true);
       try {
-        await axios.delete(`${API_URL}/students/${name}`);
+        await axios.delete(`https://student-searcher-backend.onrender.com/students/${name}`);
         setMessage(`Removed ${name} successfully!`);
         fetchStudents();
       } catch (err) {
@@ -122,7 +119,7 @@ const Manage = () => {
         <input
           type="text"
           value={grades}
-          onChange={(e) => setGrades(e.target.value)}
+          onChange={(e) => setName(e.target.value)}
           placeholder="Grades (e.g., 80,85,90)"
           required
         />

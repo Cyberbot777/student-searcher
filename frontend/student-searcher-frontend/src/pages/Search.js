@@ -16,9 +16,6 @@ const Search = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Base API URL for local or deployed backend
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
-
   // Handle search submission
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -28,17 +25,17 @@ const Search = () => {
     try {
       let response;
       if (searchType === "exact") {
-        response = await axios.get(`${API_URL}/search/name/${encodeURIComponent(name)}`);
+        response = await axios.get(`https://student-searcher-backend.onrender.com/search/name/${encodeURIComponent(name)}`);
         setResults(response.data.name ? [response.data] : []);
       } else if (searchType === "partial") {
-        response = await axios.get(`${API_URL}/search/partial/${encodeURIComponent(partialName)}`);
+        response = await axios.get(`https://student-searcher-backend.onrender.com/search/partial/${encodeURIComponent(partialName)}`);
         setResults(response.data);
       } else {
         if (minAvg && maxAvg && Number(minAvg) > Number(maxAvg)) {
           setError("Minimum average cannot be greater than maximum.");
           return;
         }
-        response = await axios.get(`${API_URL}/search/average`, {
+        response = await axios.get(`https://student-searcher-backend.onrender.com/search/average`, {
           params: { min_avg: minAvg, max_avg: maxAvg },
         });
         setResults(response.data);
