@@ -1,22 +1,21 @@
+// Main Application Component
+// This file sets up the React frontend with routing for the student-searcher app using react-router-dom.
+
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 import Home from "./pages/Home";
 import Search from "./pages/Search";
 import Manage from "./pages/Manage";
 import Stats from "./pages/Stats";
+import "./App.css";
 
+// Main App component with navigation and routes
 function App() {
   return (
     <Router>
       <div>
-        <nav style={{ marginBottom: "20px" }}>
-          <ul
-            style={{
-              listStyle: "none",
-              display: "flex",
-              gap: "20px",
-              padding: 0,
-            }}
-          >
+        {/* Navigation bar */}
+        <nav className="nav">
+          <ul className="nav-list">
             <li>
               <Link to="/">Home</Link>
             </li>
@@ -31,6 +30,7 @@ function App() {
             </li>
           </ul>
         </nav>
+        {/* Route definitions */}
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/search" element={<Search />} />

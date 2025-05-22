@@ -1,7 +1,8 @@
 # Student Searcher Program
 # This script manages a list of students, allows searching by name or average, and saves data to a file.
 
-import csv # Import the csv module for exporting and importing to CSV
+import csv  # Import the csv module for exporting and importing to CSV
+import os   # For configurable file path
 
 # Function to calculate average grade (used by multiple functions)
 def calculate_average(grades):
@@ -49,8 +50,10 @@ def sort_students_by_average(students, ascending=True):
 # --- Student modification functions (menu options 6, 7, 8) ---
 # Function to add a student with validation (menu option 6)
 def add_student(students, name, grades):
+    if search_student(students, name):  # Check for duplicate name
+        raise ValueError(f"Student {name} already exists.")
     if not validate_grades(grades):
-        raise ValueError("Grades must be between 0 and 100")
+        raise ValueError("Grades must be between 0 and 100.")
     student = {"name": name, "grades": grades}
     students.append(student)
 
@@ -60,10 +63,10 @@ def remove_student(students, name):
     if student:
         # Confirm removal with the user
         confirm = input(f"Are you sure you want to remove {name}? (yes/y or no/n): ").lower()
-        if confirm in ['yes', 'y']:
+        if confirm in ["yes", "y"]:
             students.remove(student)
             print(f"Removed {name} successfully!")
-        elif confirm in ['no', 'n']:
+        elif confirm in ["no", "n"]:
             print(f"Removal of {name} canceled.")
         else:
             print("Invalid input. Removal canceled.")
@@ -76,33 +79,31 @@ def edit_student_grades(students, name):
     if student:
         print(f"Current grades for {name}: {student['grades']}")
         confirm = input(f"Are you sure you want to edit grades for {name}? (yes/y or no/n): ").lower()
-        if confirm in ['yes', 'y']:
+        if confirm in ["yes", "y"]:
             grades_input = input("Enter new grades (comma-separated, e.g., 86,90,95): ")
             try:
                 new_grades = [int(g) for g in grades_input.split(",")]
                 if not validate_grades(new_grades):
                     print("Error: Grades must be between 0 and 100.")
                     return
-                student['grades'] = new_grades
+                student["grades"] = new_grades
                 print(f"Updated grades for {name} successfully!")
             except ValueError as e:
                 print(f"Error: {e}")
-        elif confirm in ['no', 'n']:
+        elif confirm in ["no", "n"]:
             print(f"Editing grades for {name} canceled.")
         else:
             print("Invalid input. Please enter 'yes/y' or 'no/n'. Editing canceled.")
     else:
         print(f"Student {name} not found.")
 
-# --- File I/O functions (menu option 9, 10, 11, 12) ---
+# --- File I/O functions (menu options 9, 10, 11, 12) ---
 # Function to export students to a CSV file (menu option 9)
 def export_students_to_csv(students, filename="students_export.csv"):
     try:
-        with open(filename, 'w', newline='') as file:
+        with open(filename, "w", newline="") as file:
             writer = csv.writer(file)
-            # Write the header
             writer.writerow(["Name", "Grades", "Average Grade"])
-            # Write each student's data
             for student in students:
                 avg = calculate_average(student["grades"])
                 writer.writerow([student["name"], student["grades"], f"{avg:.2f}"])
@@ -113,19 +114,16 @@ def export_students_to_csv(students, filename="students_export.csv"):
 # Function to import students from a CSV file (menu option 10)
 def import_students_from_csv(students, filename="students_export.csv"):
     try:
-        with open(filename, 'r', newline='') as file:
+        # Skip confirmation in API context (handled by frontend)
+        with open(filename, "r", newline="") as file:
             reader = csv.reader(file)
-            # Skip the header row
             header = next(reader)
             if header != ["Name", "Grades", "Average Grade"]:
                 print("Error: Invalid CSV format. Expected columns: Name, Grades, Average Grade.")
                 return
-            # Clear existing students to avoid duplicates
             students.clear()
-            # Read each row and add the student
             for row in reader:
                 name = row[0]
-                # Parse the grades from string representation (e.g., "[85, 90, 95, 88]")
                 grades_str = row[1].strip("[]")
                 grades = [int(g) for g in grades_str.split(", ") if g]
                 if not validate_grades(grades):
@@ -140,45 +138,42 @@ def import_students_from_csv(students, filename="students_export.csv"):
     except ValueError as e:
         print(f"Error parsing CSV data: {e}")
 
-# Added new function to display basic statistics (menu option 11)
+# Function to display basic statistics (menu option 11)
 def display_statistics(students):
     if not students:
         print("No students available to calculate statistics.")
         return
-    # Calculate the class average (average of all students' average grades)
     averages = [calculate_average(student["grades"]) for student in students]
     class_average = sum(averages) / len(averages)
-    # Find the highest and lowest average grades
     highest_avg = max(averages)
     lowest_avg = min(averages)
-    # Find the students with the highest and lowest averages
     highest_student = next(student["name"] for student in students if calculate_average(student["grades"]) == highest_avg)
     lowest_student = next(student["name"] for student in students if calculate_average(student["grades"]) == lowest_avg)
-    # Display the statistics
     print("\nClass Statistics:")
     print(f"Class Average: {class_average:.2f}")
     print(f"Highest Average: {highest_avg:.2f} (Student: {highest_student})")
     print(f"Lowest Average: {lowest_avg:.2f} (Student: {lowest_student})")
 
 # Function to save students to a file (menu option 12)
-def save_students(students, filename="/opt/render/students.txt"):
+def save_students(students, filename=os.getenv("DATA_PATH", "students.txt")):
     try:
-        with open(filename, 'w') as file:
+        with open(filename, "w") as file:
             for student in students:
                 file.write(f"{student['name']}: {student['grades']}\n")
     except IOError:
         print("Error: Could not save to file.")
 
 # Function to load students from a file
-def load_students(filename="/opt/render/students.txt"):
+def load_students(filename=os.getenv("DATA_PATH", "students.txt")):
     students = []
     try:
-        with open(filename, 'r') as file:
+        with open(filename, "r") as file:
             for line in file:
                 if not line.strip():
                     continue
                 try:
                     name, grades_str = line.strip().split(": ", 1)
+                    print("Name:", name, "Grades string:", grades_str)  # Debugging
                     grades_str = grades_str.strip("[]")
                     grade_strings = [g for g in grades_str.split(", ") if g]
                     grades = [int(g) for g in grade_strings]
@@ -195,10 +190,7 @@ def load_students(filename="/opt/render/students.txt"):
 
 # Main program with a menu
 def main():
-    # Load existing students
     students = load_students()
-
-    # Add some initial students if the list is empty
     if not students:
         add_student(students, "Richard", [85, 90, 95, 88])
         add_student(students, "Alice", [90, 85, 92, 84])
@@ -266,10 +258,10 @@ def main():
 
         elif choice == "5":
             direction = input("Sort by average grade (ascending/descending): ").lower()
-            if direction not in ['ascending', 'descending']:
+            if direction not in ["ascending", "descending"]:
                 print("Invalid direction. Please choose 'ascending' or 'descending'.")
                 continue
-            ascending = (direction == 'ascending')
+            ascending = direction == "ascending"
             sorted_students = sort_students_by_average(students, ascending)
             print(f"\nStudents sorted by average grade ({direction}):")
             for student in sorted_students:
@@ -305,11 +297,11 @@ def main():
 
         elif choice == "12":
             confirm = input("Are you sure you want to save and exit? (yes/y or no/n): ").lower()
-            if confirm in ['yes', 'y']:
+            if confirm in ["yes", "y"]:
                 save_students(students)
                 print("Saved and exiting.")
                 break
-            elif confirm in ['no', 'n']:
+            elif confirm in ["no", "n"]:
                 print("Exit canceled.")
             else:
                 print("Invalid input. Exit canceled.")
@@ -320,4 +312,3 @@ def main():
 # Run the program
 if __name__ == "__main__":
     main()
-

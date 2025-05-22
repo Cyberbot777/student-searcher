@@ -1,30 +1,46 @@
-import React from 'react';
+// Student List Component
+// This component renders a table displaying student names, grades, and average grades.
 
+import React from "react";
+import PropTypes from "prop-types";
+
+// StudentList component for displaying student data
 const StudentList = ({ students }) => {
+  // Calculate average grade for a student
   const calculateAverage = (grades) => {
     return grades.length ? (grades.reduce((a, b) => a + b, 0) / grades.length).toFixed(2) : 0;
   };
 
   return (
-    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+    <table className="student-table">
       <thead>
         <tr>
-          <th style={{ border: '1px solid #ddd', padding: '8px' }}>Name</th>
-          <th style={{ border: '1px solid #ddd', padding: '8px' }}>Grades</th>
-          <th style={{ border: '1px solid #ddd', padding: '8px' }}>Average Grade</th>
+          <th className="student-table-cell">Name</th>
+          <th className="student-table-cell">Grades</th>
+          <th className="student-table-cell">Average Grade</th>
         </tr>
       </thead>
       <tbody>
-        {students.map((student, index) => (
-          <tr key={index}>
-            <td style={{ border: '1px solid #ddd', padding: '8px' }}>{student.name}</td>
-            <td style={{ border: '1px solid #ddd', padding: '8px' }}>{student.grades.join(', ')}</td>
-            <td style={{ border: '1px solid #ddd', padding: '8px' }}>{calculateAverage(student.grades)}</td>
+        {students.map((student) => (
+          <tr key={student.name}>
+            <td className="student-table-cell">{student.name}</td>
+            <td className="student-table-cell">{student.grades.join(", ")}</td>
+            <td className="student-table-cell">{calculateAverage(student.grades)}</td>
           </tr>
         ))}
       </tbody>
     </table>
   );
+};
+
+// Prop type validation
+StudentList.propTypes = {
+  students: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      grades: PropTypes.arrayOf(PropTypes.number).isRequired,
+    })
+  ).isRequired,
 };
 
 export default StudentList;

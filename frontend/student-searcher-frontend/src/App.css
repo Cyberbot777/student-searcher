@@ -1,7 +1,43 @@
+/* Main Stylesheet for Student Searcher Frontend */
+/* This file defines global styles for the React frontend, including layout and navigation. */
+
 .App {
   text-align: center;
 }
 
+/* Navigation styles */
+.nav {
+  margin-bottom: 20px;
+}
+
+.nav-list {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+  padding: 0;
+}
+
+/* Message styles */
+.error {
+  color: red;
+}
+
+.success {
+  color: green;
+}
+
+/* Table styles for StudentList */
+.student-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.student-table-cell {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+/* Boilerplate styles (may be used by other components) */
 .App-logo {
   height: 40vmin;
   pointer-events: none;

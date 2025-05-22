@@ -1,40 +1,48 @@
+# Flask Backend for Student Searcher
+# This script defines a REST API using Flask to manage student data, integrating with student_searcher.py.
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import student_searcher
-import os  
-from shutil import copyfile  
+import os
+from shutil import copyfile
 
+# Initialize Flask app and enable CORS
 app = Flask(__name__)
 CORS(app)
 
+# Health Check Endpoint
 @app.route('/', methods=['GET', 'HEAD'])
 def health_check():
     return jsonify({"status": "ok", "message": "Student Searcher Backend is running"}), 200
 
+# Initialize Student Data
+students = []
 try:
-    if not os.path.exists('/opt/render/students.txt'):
-        if os.path.exists('students.txt'):
-            copyfile('students.txt', '/opt/render/students.txt')
-except Exception as e:
-    print(f"Error copying students.txt: {str(e)}")
-
-try:
-    students = student_searcher.load_students()
+    data_path = os.getenv('DATA_PATH', 'students.txt')  # Use environment variable or default
+    if not os.path.exists(data_path):
+        default_path = 'students.txt'
+        if os.path.exists(default_path):
+            copyfile(default_path, data_path)
+    students = student_searcher.load_students(filename=data_path)
     print("Loaded students:", students)
 except Exception as e:
-    print("Error loading students:", str(e))
-    students = []
+    print(f"Error initializing students: {str(e)}")
 
+# Get All Students Endpoint
 @app.route('/students', methods=['GET'])
 def get_students():
     print("Returning students:", students)
     return jsonify(students)
 
+# Add Student Endpoint
 @app.route('/students', methods=['POST'])
 def add_student():
     data = request.json
-    name = data.get('name') # type: ignore
-    grades = data.get('grades') # type: ignore
+    name = data.get('name')
+    grades = data.get('grades')
+    if not name or not grades:
+        return jsonify({"error": "Name and grades are required."}), 400
     try:
         student_searcher.add_student(students, name, grades)
         student_searcher.save_students(students)
@@ -45,10 +53,13 @@ def add_student():
     except Exception as e:
         return jsonify({"error": f"Failed to save: {str(e)}"}), 500
 
+# Edit Student Grades Endpoint
 @app.route('/students/<name>', methods=['PUT'])
 def edit_student(name):
     data = request.json
-    grades = data.get('grades') # type: ignore
+    grades = data.get('grades')
+    if not grades:
+        return jsonify({"error": "Grades are required."}), 400
     student = student_searcher.search_student(students, name)
     if student:
         try:
@@ -64,16 +75,18 @@ def edit_student(name):
             return jsonify({"error": f"Failed to save: {str(e)}"}), 500
     return jsonify({"error": f"Student {name} not found."}), 404
 
+# Remove Student Endpoint
 @app.route('/students/<name>', methods=['DELETE'])
 def remove_student(name):
-    for student in students:
-        if student["name"].lower() == name.lower():
-            students.remove(student)
-            student_searcher.save_students(students)
-            print(f"Saved students after removing {name}:", students)
-            return jsonify({"message": f"Removed {name} successfully!"})
+    student = student_searcher.search_student(students, name)
+    if student:
+        students.remove(student)
+        student_searcher.save_students(students)
+        print(f"Saved students after removing {name}:", students)
+        return jsonify({"message": f"Removed {name} successfully!"})
     return jsonify({"error": f"Student {name} not found."}), 404
 
+# Search by Exact Name Endpoint
 @app.route('/search/name/<name>', methods=['GET'])
 def search_by_name(name):
     student = student_searcher.search_student(students, name)
@@ -81,11 +94,13 @@ def search_by_name(name):
         return jsonify(student)
     return jsonify({"error": f"Student {name} not found."}), 404
 
+# Search by Partial Name Endpoint
 @app.route('/search/partial/<partial_name>', methods=['GET'])
 def search_by_partial_name(partial_name):
     results = student_searcher.search_students_by_partial_name(students, partial_name)
     return jsonify(results)
 
+# Search by Average Grade Range Endpoint
 @app.route('/search/average', methods=['GET'])
 def search_by_average():
     min_avg = request.args.get('min_avg')
@@ -104,17 +119,18 @@ def search_by_average():
     except Exception as e:
         return jsonify({"error": f"Error processing request: {str(e)}"}), 500
 
+# Get Class Statistics Endpoint
 @app.route('/statistics', methods=['GET'])
 def get_statistics():
     if not students:
         return jsonify({"error": "No students available."}), 404
     try:
         averages = [student_searcher.calculate_average(student["grades"]) for student in students]
-        class_avg = sum(averages) / len(averages)
-        highest_avg = max(averages)
-        lowest_avg = min(averages)
-        highest_student = next(student["name"] for student in students if student_searcher.calculate_average(student["grades"]) == highest_avg)
-        lowest_student = next(student["name"] for student in students if student_searcher.calculate_average(student["grades"]) == lowest_avg)
+        class_avg = sum(averages) / len(averages) if averages else 0
+        highest_avg = max(averages) if averages else 0
+        lowest_avg = min(averages) if averages else 0
+        highest_student = next((student["name"] for student in students if student_searcher.calculate_average(student["grades"]) == highest_avg), None)
+        lowest_student = next((student["name"] for student in students if student_searcher.calculate_average(student["grades"]) == lowest_avg), None)
         return jsonify({
             "class_average": class_avg,
             "highest_average": highest_avg,
@@ -125,7 +141,7 @@ def get_statistics():
     except Exception as e:
         return jsonify({"error": f"Error calculating statistics: {str(e)}"}), 500
 
+# Run Flask Application
 if __name__ == '__main__':
-    import os
     port = int(os.getenv('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
