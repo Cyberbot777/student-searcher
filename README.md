@@ -11,9 +11,15 @@
 - **Search by Partial Name:** Find students whose names contain a substring (case-insensitive) on the Search page.
 - **Search by Average Grade Range:** Find students with average grades in a specified range on the Search page.
 - **Add a Student:** Add a new student with validated name and grades through the Manage page.
-- **Remove a Student:** Remove a student with confirmation on the Manage page.
+- **Remove a Student:** Remove a student with confirmation using a red trashcan icon in the Manage page table.
 - **Edit a Student's Grades:** Update a student’s grades on the Manage page.
 - **Display Class Statistics:** Show class average, highest average grade, and lowest average grade, with corresponding students, on the Stats page.
+- **Sort Students:** Sort the student list table by:
+  - **Name**: Click the "Name" header to toggle between A-Z, Z-A, or default sort (on both Home and Manage pages).
+  - **Average Grade**: Click the "Average Grade" header to toggle between ascending (lowest to highest), descending (highest to lowest), or default sort (on both Home and Manage pages).
+- **Custom Table Layouts:** Independent column widths for Home and Manage pages:
+  - **Home Page**: "Name" (200px), "Grades" (250px), "Average Grade" (200px).
+  - **Manage Page**: "Name" (150px), "Grades" (200px), "Average Grade" (180px), "Delete" (100px).
 - **Data Persistence:** Save student data to `students.txt` on the server, updated automatically after add/edit/remove actions.
 - **Input Validation:** Ensures names contain only letters and spaces, grades are numbers between 0 and 100, and API inputs are valid.
 
@@ -26,6 +32,8 @@
 - **Frontend**:
   - **React**: JavaScript library for building the user interface.
   - **Axios**: Promise-based HTTP client for making API requests to the backend.
+  - **React Bootstrap**: For responsive UI components (tables, forms, buttons).
+  - **React Bootstrap Icons**: For trashcan icons in the Manage page table.
   - **Create React App**: Boilerplate for setting up the React project.
 - **Deployment**:
   - **Render**: Hosts the Flask backend at `https://student-searcher-backend.onrender.com`.
@@ -38,15 +46,16 @@
 1. **Access the Web App**:
    - Visit **View Live Demo: [https://student-searcher.vercel.app/](https://student-searcher.vercel.app/)** in a browser.
    - Navigate using the menu:
-     - **Home**: View all students.
+     - **Home**: View all students with sortable table.
      - **Search**: Search by name (exact or partial) or grade range.
-     - **Manage**: Add, edit, or remove students.
+     - **Manage**: Add, edit, or remove students with sortable table.
      - **Stats**: View class statistics.
 
 2. **Interact with Features**:
    - **Search**: Enter a name or grade range in the Search page form.
-   - **Manage**: Use forms to add a new student (name, comma-separated grades), edit grades, or remove a student.
+   - **Manage**: Use forms to add a new student (name, comma-separated grades), edit grades, or remove a student via trashcan icon.
    - **Stats**: View class average, highest, and lowest grades automatically.
+   - **Sort**: Click "Name" or "Average Grade" headers to sort the student list (A-Z/Z-A or ascending/descending).
 
 3. **Input Requirements**:
    - **Names**: Must contain only letters and spaces (e.g., "John Doe").
@@ -72,6 +81,7 @@
 - File I/O with text files
 - Error handling and input validation
 - Data analysis (statistics calculation)
+- Sorting and interactive UI features
 - Deployment with Render and Vercel
 - Version control with Git and GitHub
 
@@ -80,4 +90,4 @@
 
 ## Date
 - Created: March 25, 2025
-- Last Updated: May 20, 2025
+- Last Updated: May 22, 2025
