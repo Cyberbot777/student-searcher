@@ -27,7 +27,7 @@ const Home = () => {
     <Container>
       <h2 className="my-4">All Students</h2>
       {error && <Alert variant="danger">{error}</Alert>}
-      {students.length > 0 ? <StudentList students={students} /> : <p>No students found.</p>}
+      {students.length > 0 ? <StudentList students={students} hasDelete={false}/> : <p>No students found.</p>}
     </Container>
   );
 };

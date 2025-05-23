@@ -1,10 +1,8 @@
-// Manage Students Page Component
-// Allows adding, editing, and removing students with styled forms.
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import StudentList from '../components/StudentList';
 import { Container, Form, Button, Alert } from 'react-bootstrap';
+import { Trash } from 'react-bootstrap-icons'; 
 
 const Manage = () => {
   const [students, setStudents] = useState([]);
@@ -131,17 +129,8 @@ const Manage = () => {
       {message && <Alert variant="success">{message}</Alert>}
       {students.length > 0 ? (
         <>
-          <StudentList students={students} />
-          {students.map((student) => (
-            <Button
-              key={student.name}
-              onClick={() => handleRemove(student.name)}
-              variant="danger"
-              className="m-2"
-            >
-              Remove {student.name}
-            </Button>
-          ))}
+          <StudentList students={students} hasDelete={true}/>
+         
         </>
       ) : (
         <p>No students found.</p>
