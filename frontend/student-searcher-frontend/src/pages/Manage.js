@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import StudentList from '../components/StudentList';
 import { Container, Form, Button, Alert } from 'react-bootstrap';
-import { Trash } from 'react-bootstrap-icons'; 
 
 const Manage = () => {
   const [students, setStudents] = useState([]);
@@ -79,7 +78,7 @@ const Manage = () => {
   };
 
   return (
-    <Container>
+    <Container style={{ paddingBottom: '1.5rem' }}>
       <h2 className="my-4">Manage Students</h2>
       <h3>Add Student</h3>
       <Form onSubmit={handleAdd} className="mb-4">
@@ -109,7 +108,7 @@ const Manage = () => {
           <Form.Control
             type="text"
             value={editName}
-            onChange={(e) => setEditName(e.target.value)}
+            onChange={(e) => setName(e.target.value)}
             placeholder="Student name"
             required
           />
@@ -128,10 +127,7 @@ const Manage = () => {
       {error && <Alert variant="danger">{error}</Alert>}
       {message && <Alert variant="success">{message}</Alert>}
       {students.length > 0 ? (
-        <>
-          <StudentList students={students} hasDelete={true}/>
-         
-        </>
+        <StudentList students={students} hasDelete={true} onDelete={handleRemove} />
       ) : (
         <p>No students found.</p>
       )}

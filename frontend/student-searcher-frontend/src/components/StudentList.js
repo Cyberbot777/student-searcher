@@ -1,6 +1,6 @@
 import React from 'react';
 import { Table } from 'react-bootstrap';
-import { Trash } from 'react-bootstrap-icons'; 
+import { Trash } from 'react-bootstrap-icons';
 
 const StudentList = ({ students, onDelete, hasDelete = false }) => {
   const calculateAverage = (grades) => {
@@ -14,7 +14,7 @@ const StudentList = ({ students, onDelete, hasDelete = false }) => {
           <th>Name</th>
           <th>Grades</th>
           <th>Average Grade</th>
-          { hasDelete && <th>Delete</th>}
+          {hasDelete && <th style={{ width: '150px' }}>Delete</th>}
         </tr>
       </thead>
       <tbody>
@@ -23,7 +23,7 @@ const StudentList = ({ students, onDelete, hasDelete = false }) => {
             <td>{student.name}</td>
             <td>{student.grades.join(', ')}</td>
             <td>{calculateAverage(student.grades)}</td>
-             { hasDelete &&<td>
+            {hasDelete && <td style={{ width: '150px', textAlign: 'left' }}>
               <span
                 onClick={() => onDelete(student.name)}
                 style={{ cursor: 'pointer' }}
