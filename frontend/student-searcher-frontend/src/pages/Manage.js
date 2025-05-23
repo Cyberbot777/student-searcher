@@ -108,7 +108,7 @@ const Manage = () => {
           <Form.Control
             type="text"
             value={editName}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => setEditName(e.target.value)}
             placeholder="Student name"
             required
           />
@@ -127,7 +127,17 @@ const Manage = () => {
       {error && <Alert variant="danger">{error}</Alert>}
       {message && <Alert variant="success">{message}</Alert>}
       {students.length > 0 ? (
-        <StudentList students={students} hasDelete={true} onDelete={handleRemove} />
+        <StudentList
+          students={students}
+          hasDelete={true}
+          onDelete={handleRemove}
+          columnWidths={{
+            name: '150px',
+            grades: '200px',
+            averageGrade: '180px',
+            delete: '100px',
+          }}
+        />
       ) : (
         <p>No students found.</p>
       )}

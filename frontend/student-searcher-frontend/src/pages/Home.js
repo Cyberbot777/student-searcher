@@ -27,7 +27,19 @@ const Home = () => {
     <Container>
       <h2 className="my-4">All Students</h2>
       {error && <Alert variant="danger">{error}</Alert>}
-      {students.length > 0 ? <StudentList students={students} hasDelete={false}/> : <p>No students found.</p>}
+      {students.length > 0 ? (
+        <StudentList
+          students={students}
+          hasDelete={false}
+          columnWidths={{
+            name: '200px',
+            grades: '250px',
+            averageGrade: '200px',
+          }}
+        />
+      ) : (
+        <p>No students found.</p>
+      )}
     </Container>
   );
 };
