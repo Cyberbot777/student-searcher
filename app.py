@@ -17,18 +17,15 @@ def health_check():
     return jsonify({"status": "ok", "message": "Student Searcher Backend is running"}), 200
 
 # Initialize Student Data
-students = []
-try:
-    data_path = os.getenv('DATA_PATH', 'students.txt')  # Use environment variable or default
-    if not os.path.exists(data_path):
-        default_path = 'students.txt'
-        if os.path.exists(default_path):
-            copyfile(default_path, data_path)
-    students = student_searcher.load_students(filename=data_path)
-    print("Loaded students:", students)
-except Exception as e:
-    print(f"Error initializing students: {str(e)}")
-
+# Removed file-based initialization since we're now using MongoDB
+students = student_searcher.load_students()
+# Load initial students if the collection is empty
+if not students:
+    # Create initial students directly instead of running the CLI menu
+    student_searcher.add_student(students, "Richard Smith", [85, 90, 95, 88])
+    student_searcher.add_student(students, "Alice Johnson", [90, 85, 92, 84])
+    student_searcher.add_student(students, "Mike Brown", [99, 86, 90])
+    
 # Get All Students Endpoint
 @app.route('/students', methods=['GET'])
 def get_students():
@@ -43,9 +40,13 @@ def add_student():
     grades = data.get('grades')
     if not name or not grades:
         return jsonify({"error": "Name and grades are required."}), 400
+    
+    # Validate name on the backend
+    if not student_searcher.validate_name(name):
+        return jsonify({"error": "Name must include a first and last name (e.g., John Doe) with letters and spaces only."}), 400
+
     try:
         student_searcher.add_student(students, name, grades)
-        student_searcher.save_students(students)
         print(f"Saved students after adding {name}:", students)
         return jsonify({"message": f"Added {name} successfully!"}), 201
     except ValueError as e:
@@ -66,7 +67,7 @@ def edit_student(name):
             if not student_searcher.validate_grades(grades):
                 return jsonify({"error": "Grades must be between 0 and 100."}), 400
             student["grades"] = grades
-            student_searcher.save_students(students)
+            student_searcher.update_grades(students, name, grades)  # Use updated function from student_searcher
             print(f"Saved students after editing {name}:", students)
             return jsonify({"message": f"Updated grades for {name} successfully!"})
         except ValueError as e:
@@ -80,8 +81,7 @@ def edit_student(name):
 def remove_student(name):
     student = student_searcher.search_student(students, name)
     if student:
-        students.remove(student)
-        student_searcher.save_students(students)
+        student_searcher.remove_student(students, name)  # Use updated function from student_searcher
         print(f"Saved students after removing {name}:", students)
         return jsonify({"message": f"Removed {name} successfully!"})
     return jsonify({"error": f"Student {name} not found."}), 404

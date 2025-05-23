@@ -87,7 +87,7 @@ const Manage = () => {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Student name"
+            placeholder= "e.g., First Last name"
             required
           />
         </Form.Group>
@@ -109,7 +109,7 @@ const Manage = () => {
             type="text"
             value={editName}
             onChange={(e) => setEditName(e.target.value)}
-            placeholder="Student name"
+            placeholder="e.g., First Last name"
             required
           />
         </Form.Group>

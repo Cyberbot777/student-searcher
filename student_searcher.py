@@ -3,6 +3,14 @@
 
 import csv  # Import the csv module for exporting and importing to CSV
 import os   # For configurable file path
+import re   # For validation regex
+from pymongo import MongoClient  # Added for MongoDB integration
+
+# MongoDB connection setup
+mongo_uri = os.getenv("MONGO_URI", "mongodb+srv://studentadmin:sj8uuu50ksjuDD9@studentsearchercluster.uhtoqb4.mongodb.net/?retryWrites=true&w=majority&appName=StudentSearcherCluster")
+client = MongoClient(mongo_uri)
+db = client["student_searcher"]
+students_collection = db["students"]
 
 # Function to calculate average grade (used by multiple functions)
 def calculate_average(grades):
@@ -15,6 +23,15 @@ def validate_grades(grades):
     for grade in grades:
         if not (0 <= grade <= 100):
             return False
+    return True
+
+# Added function to validate student name for first and last name
+def validate_name(name):
+    name_parts = name.strip().split()
+    if len(name_parts) < 2:
+        return False
+    if not re.match(r'^[A-Za-z\s]+$', name):
+        return False
     return True
 
 # --- Search-related functions (menu options 2, 3, 4) ---
@@ -54,8 +71,13 @@ def add_student(students, name, grades):
         raise ValueError(f"Student {name} already exists.")
     if not validate_grades(grades):
         raise ValueError("Grades must be between 0 and 100.")
+    # Added name validation to require first and last name
+    if not validate_name(name):
+        raise ValueError("Name must include a first and last name (e.g., John Doe) with letters and spaces only.")
     student = {"name": name, "grades": grades}
     students.append(student)
+    # Save to MongoDB instead of file
+    students_collection.insert_one(student)
 
 # Function to remove a student by name (menu option 7)
 def remove_student(students, name):
@@ -65,6 +87,8 @@ def remove_student(students, name):
         confirm = input(f"Are you sure you want to remove {name}? (yes/y or no/n): ").lower()
         if confirm in ["yes", "y"]:
             students.remove(student)
+            # Remove from MongoDB
+            students_collection.delete_one({"name": name})
             print(f"Removed {name} successfully!")
         elif confirm in ["no", "n"]:
             print(f"Removal of {name} canceled.")
@@ -72,6 +96,16 @@ def remove_student(students, name):
             print("Invalid input. Removal canceled.")
     else:
         print(f"Student {name} not found.")
+
+# Function to update a student's grades (used by app.py for API)
+def update_grades(students, name, grades):
+    student = search_student(students, name)
+    if not student:
+        raise ValueError(f"Student {name} not found")
+    if not validate_grades(grades):
+        raise ValueError("Grades must be between 0 and 100")
+    student["grades"] = grades
+    students_collection.update_one({"name": name}, {"$set": {"grades": grades}})
 
 # Function to edit a student's grades (menu option 8)
 def edit_student_grades(students, name):
@@ -87,6 +121,8 @@ def edit_student_grades(students, name):
                     print("Error: Grades must be between 0 and 100.")
                     return
                 student["grades"] = new_grades
+                # Update in MongoDB
+                students_collection.update_one({"name": name}, {"$set": {"grades": new_grades}})
                 print(f"Updated grades for {name} successfully!")
             except ValueError as e:
                 print(f"Error: {e}")
@@ -122,6 +158,8 @@ def import_students_from_csv(students, filename="students_export.csv"):
                 print("Error: Invalid CSV format. Expected columns: Name, Grades, Average Grade.")
                 return
             students.clear()
+            # Clear MongoDB collection before importing
+            students_collection.delete_many({})
             for row in reader:
                 name = row[0]
                 grades_str = row[1].strip("[]")
@@ -156,45 +194,27 @@ def display_statistics(students):
 
 # Function to save students to a file (menu option 12)
 def save_students(students, filename=os.getenv("DATA_PATH", "students.txt")):
-    try:
-        with open(filename, "w") as file:
-            for student in students:
-                file.write(f"{student['name']}: {student['grades']}\n")
-    except IOError:
-        print("Error: Could not save to file.")
+    # Removed file I/O, now handled by MongoDB operations
+    pass
 
 # Function to load students from a file
 def load_students(filename=os.getenv("DATA_PATH", "students.txt")):
-    students = []
-    try:
-        with open(filename, "r") as file:
-            for line in file:
-                if not line.strip():
-                    continue
-                try:
-                    name, grades_str = line.strip().split(": ", 1)
-                    print("Name:", name, "Grades string:", grades_str)  # Debugging
-                    grades_str = grades_str.strip("[]")
-                    grade_strings = [g for g in grades_str.split(", ") if g]
-                    grades = [int(g) for g in grade_strings]
-                    add_student(students, name, grades)
-                except ValueError as e:
-                    print(f"Error parsing line '{line.strip()}': {e}")
-                except Exception as e:
-                    print(f"Unexpected error parsing line '{line.strip()}': {e}")
-    except FileNotFoundError:
-        print("File not found. Starting with an empty student list.")
-    except IOError:
-        print("Error: Could not read from file.")
+    # Updated to load from MongoDB instead of file
+    students = list(students_collection.find())
+    # Ensure grades are integers (MongoDB stores as list of numbers)
+    for student in students:
+        student["grades"] = [int(g) for g in student["grades"]]
+        # Remove MongoDB's _id field from the response
+        student.pop("_id", None)
     return students
 
 # Main program with a menu
 def main():
     students = load_students()
     if not students:
-        add_student(students, "Richard", [85, 90, 95, 88])
-        add_student(students, "Alice", [90, 85, 92, 84])
-        add_student(students, "Mike", [99, 86, 90])
+        add_student(students, "Richard Smith", [85, 90, 95, 88])
+        add_student(students, "Alice Johnson", [90, 85, 92, 84])
+        add_student(students, "Mike Brown", [99, 86, 90])
 
     while True:
         print("\nStudent Searcher Menu:")
