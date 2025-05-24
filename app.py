@@ -5,9 +5,8 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import student_searcher
 import os
-from shutil import copyfile
 
-# Initialize Flask app and enable CORS
+# Initialize Flask app and enable CORS for all endpoints
 app = Flask(__name__)
 CORS(app)
 
@@ -16,19 +15,10 @@ CORS(app)
 def health_check():
     return jsonify({"status": "ok", "message": "Student Searcher Backend is running"}), 200
 
-# Initialize Student Data
-# Removed file-based initialization since we're now using MongoDB
-students = student_searcher.load_students()
-# Load initial students if the collection is empty
-if not students:
-    # Create initial students directly instead of running the CLI menu
-    student_searcher.add_student(students, "Richard Smith", [85, 90, 95, 88])
-    student_searcher.add_student(students, "Alice Johnson", [90, 85, 92, 84])
-    student_searcher.add_student(students, "Mike Brown", [99, 86, 90])
-    
 # Get All Students Endpoint
 @app.route('/students', methods=['GET'])
 def get_students():
+    students = student_searcher.load_students()
     print("Returning students:", students)
     return jsonify(students)
 
@@ -36,6 +26,8 @@ def get_students():
 @app.route('/students', methods=['POST'])
 def add_student():
     data = request.json
+    if not data:
+        return jsonify({"error": "Invalid or missing JSON data in request body."}), 400
     name = data.get('name')
     grades = data.get('grades')
     if not name or not grades:
@@ -46,6 +38,7 @@ def add_student():
         return jsonify({"error": "Name must include a first and last name (e.g., John Doe) with letters and spaces only."}), 400
 
     try:
+        students = student_searcher.load_students()
         student_searcher.add_student(students, name, grades)
         print(f"Saved students after adding {name}:", students)
         return jsonify({"message": f"Added {name} successfully!"}), 201
@@ -54,20 +47,20 @@ def add_student():
     except Exception as e:
         return jsonify({"error": f"Failed to save: {str(e)}"}), 500
 
-# Edit Student Grades Endpoint
+# Update Student Grades Endpoint
 @app.route('/students/<name>', methods=['PUT'])
-def edit_student(name):
+def update_grades(name):
     data = request.json
     grades = data.get('grades')
     if not grades:
         return jsonify({"error": "Grades are required."}), 400
+    students = student_searcher.load_students()
     student = student_searcher.search_student(students, name)
     if student:
         try:
             if not student_searcher.validate_grades(grades):
                 return jsonify({"error": "Grades must be between 0 and 100."}), 400
-            student["grades"] = grades
-            student_searcher.update_grades(students, name, grades)  # Use updated function from student_searcher
+            student_searcher.update_grades(students, name, grades)
             print(f"Saved students after editing {name}:", students)
             return jsonify({"message": f"Updated grades for {name} successfully!"})
         except ValueError as e:
@@ -79,9 +72,10 @@ def edit_student(name):
 # Remove Student Endpoint
 @app.route('/students/<name>', methods=['DELETE'])
 def remove_student(name):
+    students = student_searcher.load_students()
     student = student_searcher.search_student(students, name)
     if student:
-        student_searcher.remove_student(students, name)  # Use updated function from student_searcher
+        student_searcher.remove_student(students, name)
         print(f"Saved students after removing {name}:", students)
         return jsonify({"message": f"Removed {name} successfully!"})
     return jsonify({"error": f"Student {name} not found."}), 404
@@ -89,6 +83,7 @@ def remove_student(name):
 # Search by Exact Name Endpoint
 @app.route('/search/name/<name>', methods=['GET'])
 def search_by_name(name):
+    students = student_searcher.load_students()
     student = student_searcher.search_student(students, name)
     if student:
         return jsonify(student)
@@ -97,6 +92,7 @@ def search_by_name(name):
 # Search by Partial Name Endpoint
 @app.route('/search/partial/<partial_name>', methods=['GET'])
 def search_by_partial_name(partial_name):
+    students = student_searcher.load_students()
     results = student_searcher.search_students_by_partial_name(students, partial_name)
     return jsonify(results)
 
@@ -112,6 +108,7 @@ def search_by_average():
         max_avg = float(max_avg)
         if min_avg > max_avg:
             return jsonify({"error": "min_avg cannot be greater than max_avg."}), 400
+        students = student_searcher.load_students()
         results = student_searcher.search_students_by_average(students, min_avg, max_avg)
         return jsonify(results)
     except ValueError:
@@ -122,6 +119,7 @@ def search_by_average():
 # Get Class Statistics Endpoint
 @app.route('/statistics', methods=['GET'])
 def get_statistics():
+    students = student_searcher.load_students()
     if not students:
         return jsonify({"error": "No students available."}), 404
     try:
