@@ -83,19 +83,9 @@ def add_student(students, name, grades):
 def remove_student(students, name):
     student = search_student(students, name)
     if student:
-        # Confirm removal with the user
-        confirm = input(f"Are you sure you want to remove {name}? (yes/y or no/n): ").lower()
-        if confirm in ["yes", "y"]:
-            students.remove(student)
-            # Remove from MongoDB
-            students_collection.delete_one({"name": name})
-            print(f"Removed {name} successfully!")
-        elif confirm in ["no", "n"]:
-            print(f"Removal of {name} canceled.")
-        else:
-            print("Invalid input. Removal canceled.")
+        students.remove(student)
     else:
-        print(f"Student {name} not found.")
+        raise ValueError(f"Student {name} not found")
 
 # Function to update a student's grades (used by app.py for API)
 def update_grades(students, name, grades):
