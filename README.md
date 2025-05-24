@@ -3,7 +3,7 @@
 **View Live Demo: [https://student-searcher.vercel.app/](https://student-searcher.vercel.app/)**
 
 ## Overview
-`Student Searcher` is a full-stack web application for managing student records. Originally a Python-based command-line tool, it has been enhanced with a Flask backend and a React frontend, deployed on Render and Vercel. Users can view, search, manage, and analyze student data through an intuitive web interface, with data persisted in a text file (`students.txt`).
+`Student Searcher` is a full-stack web application for managing student records. Originally a Python-based command-line tool, it has been enhanced with a Flask backend and a React frontend, deployed on Render and Vercel. Users can view, search, manage, and analyze student data through an intuitive web interface, with data persisted in MongoDB Atlas (`StudentSearcherCluster`).
 
 ## Features
 - **View All Students:** Display all students in a table with names, grades, and average grades on the Home page.
@@ -11,16 +11,14 @@
 - **Search by Partial Name:** Find students whose names contain a substring (case-insensitive) on the Search page.
 - **Search by Average Grade Range:** Find students with average grades in a specified range on the Search page.
 - **Add a Student:** Add a new student with validated name and grades through the Manage page.
-- **Remove a Student:** Remove a student with confirmation using a red trashcan icon in the Manage page table.
+- **Remove a Student:** Remove a student with confirmation.
 - **Edit a Student's Grades:** Update a student’s grades on the Manage page.
 - **Display Class Statistics:** Show class average, highest average grade, and lowest average grade, with corresponding students, on the Stats page.
 - **Sort Students:** Sort the student list table by:
   - **Name**: Click the "Name" header to toggle between A-Z, Z-A, or default sort (on both Home and Manage pages).
   - **Average Grade**: Click the "Average Grade" header to toggle between ascending (lowest to highest), descending (highest to lowest), or default sort (on both Home and Manage pages).
-- **Custom Table Layouts:** Independent column widths for Home and Manage pages:
-  - **Home Page**: "Name" (200px), "Grades" (250px), "Average Grade" (200px).
-  - **Manage Page**: "Name" (150px), "Grades" (200px), "Average Grade" (180px), "Delete" (100px).
-- **Data Persistence:** Save student data to `students.txt` on the server, updated automatically after add/edit/remove actions.
+- **Custom Table Layouts:** Independent column widths for Home and Manage pages.
+- **Data Persistence:** Save student data to MongoDB Atlas (`StudentSearcherCluster`), updated automatically after add/edit/remove actions.
 - **Input Validation:** Ensures names contain only letters and spaces, grades are numbers between 0 and 100, and API inputs are valid.
 
 ## Technologies
@@ -39,8 +37,8 @@
   - **Render**: Hosts the Flask backend at `https://student-searcher-backend.onrender.com`.
   - **Vercel**: Hosts the React frontend at `https://student-searcher.vercel.app`.
   - **GitHub**: Version control and source code hosting.
-- **File I/O**:
-  - Text file (`students.txt`) for persistent data storage on the server.
+- **Database**:
+  - MongoDB Atlas (`StudentSearcherCluster`) for persistent data storage on the server.
 
 ## Usage Instructions
 1. **Access the Web App**:
@@ -85,8 +83,17 @@
 - Deployment with Render and Vercel
 - Version control with Git and GitHub
 
+## Updates and Enhancements
+- Converted storage from `students.txt` to MongoDB Atlas (`StudentSearcherCluster`) for scalable, persistent data storage.
+- Updated `student_searcher.py` to use MongoDB for all data operations (add, remove, update, load).
+- Fixed `ObjectId` serialization issue by removing `_id` fields from MongoDB documents before JSON serialization.
+- Resolved CORS errors by simplifying Flask-CORS configuration to allow all origins and methods.
+- Removed CLI prompts (e.g., `input()` in `remove_student`, `edit_student_grades`) to make backend functions API-friendly.
+- Added MongoDB dependency (`pymongo`) to `requirements.txt` for backend setup.
+- Updated Manage page placeholders to "e.g., First Last name" for clarity on name input requirements.
+
 ## Author
-- Richard
+- Richard Hall
 
 ## Date
 - Created: March 25, 2025
