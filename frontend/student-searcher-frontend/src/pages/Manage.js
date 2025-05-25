@@ -19,10 +19,8 @@ const Manage = () => {
     try {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/students`);
       setStudents(response.data);
-      console.log("Fetched students:", response.data); 
     } catch (err) {
       setError('Error fetching students.');
-      console.error("Fetch students error:", err); 
     }
   };
 
@@ -30,23 +28,31 @@ const Manage = () => {
     fetchStudents();
   }, []);
 
+  const validateGradesInput = (gradesString) => {
+    const gradesArray = gradesString.split(',').map(Number);
+    if (gradesArray.some(g => g < 0 || g > 100 || isNaN(g))) {
+      throw new Error('Grades must be numbers between 0 and 100.');
+    }
+    return gradesArray;
+  };
+
+  const handleError = (err, defaultMessage) => {
+    setError(err.response?.data?.error || defaultMessage);
+  };
+
   const handleAdd = async (e) => {
     e.preventDefault();
     setError('');
     setMessage('');
     try {
-      const gradesArray = grades.split(',').map(Number);
-      if (gradesArray.some(g => g < 0 || g > 100 || isNaN(g))) {
-        setError('Grades must be numbers between 0 and 100.');
-        return;
-      }
+      const gradesArray = validateGradesInput(grades);
       await axios.post(`${process.env.REACT_APP_API_URL}/students`, { name, grades: gradesArray });
       setMessage('Student added successfully!');
       setName('');
       setGrades('');
       fetchStudents();
     } catch (err) {
-      setError(err.response?.data?.error || 'Error adding student.');
+      handleError(err, 'Error adding student.');
     }
   };
 
@@ -55,18 +61,14 @@ const Manage = () => {
     setError('');
     setMessage('');
     try {
-      const gradesArray = editGrades.split(',').map(Number);
-      if (gradesArray.some(g => g < 0 || g > 100 || isNaN(g))) {
-        setError('Grades must be numbers between 0 and 100.');
-        return;
-      }
+      const gradesArray = validateGradesInput(editGrades);
       await axios.put(`${process.env.REACT_APP_API_URL}/students/${editName}`, { grades: gradesArray });
       setMessage('Grades updated successfully!');
       setEditName('');
       setEditGrades('');
       fetchStudents();
     } catch (err) {
-      setError(err.response?.data?.error || 'Error updating grades.');
+      handleError(err, 'Error updating grades.');
     }
   };
 
@@ -75,12 +77,10 @@ const Manage = () => {
       try {
         await axios.delete(`${process.env.REACT_APP_API_URL}/students/${name}`);
         setMessage(`Removed ${name} successfully!`);
-        setError(''); // Clear any previous errors
-        console.log(`Deleted ${name}, refetching students...`); // Debug log
-        await fetchStudents(); // Ensure the list is refreshed
+        setError('');
+        fetchStudents();
       } catch (err) {
-        setError(err.response?.data?.error || 'Error removing student.');
-        console.error('Delete error:', err.response?.data?.error); // Debug log
+        handleError(err, 'Error removing student.');
       }
     }
   };
