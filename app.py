@@ -40,6 +40,8 @@ def add_student():
     try:
         students = student_searcher.load_students()
         student_searcher.add_student(students, name, grades)
+        # Reload students to ensure the list is up-to-date
+        students = student_searcher.load_students()
         print(f"Saved students after adding {name}:", students)
         return jsonify({"message": f"Added {name} successfully!"}), 201
     except ValueError as e:
