@@ -6,23 +6,22 @@ from flask_cors import CORS
 import student_searcher
 import os
 
-# Initialize Flask app and enable CORS for all endpoints
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {
+    "origins": ["https://student-searcher.vercel.app", "http://localhost:3000"],
+    "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    "allow_headers": ["Content-Type"]
+}})
 
-# Health Check Endpoint
 @app.route('/', methods=['GET', 'HEAD'])
 def health_check():
     return jsonify({"status": "ok", "message": "Student Searcher Backend is running"}), 200
 
-# Get All Students Endpoint
 @app.route('/students', methods=['GET'])
 def get_students():
     students = student_searcher.load_students()
-    print("Returning students:", students)
     return jsonify(students)
 
-# Add Student Endpoint
 @app.route('/students', methods=['POST'])
 def add_student():
     data = request.json
@@ -33,21 +32,18 @@ def add_student():
     if not name or not grades:
         return jsonify({"error": "Name and grades are required."}), 400
     
-    # Validate name on the backend
     if not student_searcher.validate_name(name):
         return jsonify({"error": "Name must include a first and last name (e.g., John Doe) with letters and spaces only."}), 400
 
     try:
         students = student_searcher.load_students()
         student_searcher.add_student(students, name, grades)
-        print(f"Added {name} successfully!")
         return jsonify({"message": f"Added {name} successfully!"}), 201
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
     except Exception as e:
         return jsonify({"error": f"Failed to save: {str(e)}"}), 500
 
-# Update Student Grades Endpoint
 @app.route('/students/<name>', methods=['PUT'])
 def update_grades(name):
     data = request.json
@@ -61,7 +57,6 @@ def update_grades(name):
             if not student_searcher.validate_grades(grades):
                 return jsonify({"error": "Grades must be between 0 and 100."}), 400
             student_searcher.update_grades(students, name, grades)
-            print(f"Updated grades for {name} successfully!")
             return jsonify({"message": f"Updated grades for {name} successfully!"})
         except ValueError as e:
             return jsonify({"error": str(e)}), 400
@@ -69,18 +64,15 @@ def update_grades(name):
             return jsonify({"error": f"Failed to save: {str(e)}"}), 500
     return jsonify({"error": f"Student {name} not found."}), 404
 
-# Remove Student Endpoint
 @app.route('/students/<name>', methods=['DELETE'])
 def remove_student(name):
     students = student_searcher.load_students()
     student = student_searcher.search_student(students, name)
     if student:
         student_searcher.remove_student(students, name)
-        print(f"Removed {name} successfully!")
         return jsonify({"message": f"Removed {name} successfully!"})
     return jsonify({"error": f"Student {name} not found."}), 404
 
-# Search by Exact Name Endpoint
 @app.route('/search/name/<name>', methods=['GET'])
 def search_by_name(name):
     students = student_searcher.load_students()
@@ -89,14 +81,12 @@ def search_by_name(name):
         return jsonify(student)
     return jsonify({"error": f"Student {name} not found."}), 404
 
-# Search by Partial Name Endpoint
 @app.route('/search/partial/<partial_name>', methods=['GET'])
 def search_by_partial_name(partial_name):
     students = student_searcher.load_students()
     results = student_searcher.search_students_by_partial_name(students, partial_name)
     return jsonify(results)
 
-# Search by Average Grade Range Endpoint
 @app.route('/search/average', methods=['GET'])
 def search_by_average():
     min_avg = request.args.get('min_avg')
@@ -116,7 +106,6 @@ def search_by_average():
     except Exception as e:
         return jsonify({"error": f"Error processing request: {str(e)}"}), 500
 
-# Get Class Statistics Endpoint
 @app.route('/statistics', methods=['GET'])
 def get_statistics():
     students = student_searcher.load_students()
@@ -139,7 +128,6 @@ def get_statistics():
     except Exception as e:
         return jsonify({"error": f"Error calculating statistics: {str(e)}"}), 500
 
-# Run Flask Application
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
