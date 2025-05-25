@@ -4,3 +4,4 @@ __pycache__/
 venv/
 frontend/student-searcher-frontend/node_modules/
 frontend/student-searcher-frontend/build/
+.env

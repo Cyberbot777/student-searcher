@@ -19,10 +19,10 @@ const Manage = () => {
     try {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/students`);
       setStudents(response.data);
-      console.log("Fetched students:", response.data); // Debug log
+      console.log("Fetched students:", response.data); 
     } catch (err) {
       setError('Error fetching students.');
-      console.error("Fetch students error:", err); // Debug log
+      console.error("Fetch students error:", err); 
     }
   };
 
