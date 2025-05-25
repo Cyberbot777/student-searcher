@@ -5,9 +5,15 @@ import csv  # Import the csv module for exporting and importing to CSV
 import os   # For configurable file path
 import re   # For validation regex
 from pymongo import MongoClient  # Added for MongoDB integration
+from dotenv import load_dotenv  # Added to load .env file
+
+# Load environment variables from .env file in the env folder
+load_dotenv(os.path.join(os.path.dirname(__file__), 'env', '.env'))
 
 # MongoDB connection setup
-mongo_uri = os.getenv("MONGO_URI", "mongodb+srv://studentadmin:sj8uuu50ksjuDD9@studentsearchercluster.uhtoqb4.mongodb.net/?retryWrites=true&w=majority&appName=StudentSearcherCluster")
+mongo_uri = os.getenv("MONGO_URI")
+if not mongo_uri:
+    raise ValueError("MONGO_URI environment variable not set.")
 client = MongoClient(mongo_uri)
 db = client["student_searcher"]
 students_collection = db["students"]
@@ -37,17 +43,35 @@ def validate_name(name):
 # --- Search-related functions (menu options 2, 3, 4) ---
 # Function to search for a student by name (exact match)
 def search_student(students, name):
-    for student in students:
-        if student["name"].lower() == name.lower():
-            return student
-    return None
+    # Trim the input name to handle extra spaces
+    name = name.strip()
+    print(f"Searching for student: '{name}'")  # Log the search
+    # Query MongoDB directly, trimming spaces from both the input and the stored name
+    student = students_collection.find_one({
+        "$expr": {
+            "$eq": [
+                {"$trim": {"input": "$name"}},
+                name
+            ]
+        }
+    })
+    if student:
+        student["grades"] = [int(g) for g in student["grades"]]
+        student.pop("_id", None)
+        print(f"Found student: {student}")  # Log the found student
+    else:
+        print(f"Student '{name}' not found in MongoDB")  # Log if not found
+    return student
 
 # Function to search for students by partial name (menu option 3)
 def search_students_by_partial_name(students, partial_name):
     results = []
-    for student in students:
-        if partial_name.lower() in student["name"].lower():
-            results.append(student)
+    # Query MongoDB directly
+    cursor = students_collection.find({"name": {"$regex": partial_name, "$options": "i"}})
+    for student in cursor:
+        student["grades"] = [int(g) for g in student["grades"]]
+        student.pop("_id", None)
+        results.append(student)
     return results
 
 # Function to search for students by average grade range (menu option 4)
@@ -67,46 +91,46 @@ def sort_students_by_average(students, ascending=True):
 # --- Student modification functions (menu options 6, 7, 8) ---
 # Function to add a student with validation (menu option 6)
 def add_student(students, name, grades):
-    if search_student(students, name):  # Check for duplicate name
+    # Check for duplicate name directly in MongoDB
+    if students_collection.find_one({"$expr": {"$eq": [{"$trim": {"input": "$name"}}, name.strip()]}}):
         raise ValueError(f"Student {name} already exists.")
     if not validate_grades(grades):
         raise ValueError("Grades must be between 0 and 100.")
     # Added name validation to require first and last name
     if not validate_name(name):
         raise ValueError("Name must include a first and last name (e.g., John Doe) with letters and spaces only.")
-    student = {"name": name, "grades": grades}
-    students.append(student)
-    # Save to MongoDB instead of file
+    student = {"name": name.strip(), "grades": grades}  # Ensure no trailing spaces in name
+    # Save to MongoDB directly
     students_collection.insert_one(student)
 
 # Function to remove a student by name (menu option 7)
 def remove_student(students, name):
-    student = search_student(students, name)
+    # Query MongoDB directly to check if the student exists
+    student = students_collection.find_one({"$expr": {"$eq": [{"$trim": {"input": "$name"}}, name.strip()]}})
     if student:
-        students.remove(student)
-        # Remove from MongoDB
-        students_collection.delete_one({"name": name})
+        # Remove from MongoDB directly
+        students_collection.delete_one({"$expr": {"$eq": [{"$trim": {"input": "$name"}}, name.strip()]}})
     else:
         raise ValueError(f"Student {name} not found")
 
 # Function to update a student's grades (used by app.py for API)
 def update_grades(students, name, grades):
-    student = search_student(students, name)
+    # Query MongoDB directly to check if the student exists
+    student = students_collection.find_one({"$expr": {"$eq": [{"$trim": {"input": "$name"}}, name.strip()]}})
     if not student:
         raise ValueError(f"Student {name} not found")
     if not validate_grades(grades):
         raise ValueError("Grades must be between 0 and 100")
-    student["grades"] = grades
-    students_collection.update_one({"name": name}, {"$set": {"grades": grades}})
+    students_collection.update_one({"$expr": {"$eq": [{"$trim": {"input": "$name"}}, name.strip()]}}, {"$set": {"grades": grades}})
 
 # Function to edit a student's grades (menu option 8)
 def edit_student_grades(students, name, grades):
-    student = search_student(students, name)
+    # Query MongoDB directly to check if the student exists
+    student = students_collection.find_one({"$expr": {"$eq": [{"$trim": {"input": "$name"}}, name.strip()]}})
     if student:
         if not validate_grades(grades):
             raise ValueError("Grades must be between 0 and 100")
-        student["grades"] = grades
-        students_collection.update_one({"name": name}, {"$set": {"grades": grades}})
+        students_collection.update_one({"$expr": {"$eq": [{"$trim": {"input": "$name"}}, name.strip()]}}, {"$set": {"grades": grades}})
     else:
         raise ValueError(f"Student {name} not found")
 
@@ -131,7 +155,6 @@ def import_students_from_csv(students, filename="students_export.csv"):
             header = next(reader)
             if header != ["Name", "Grades", "Average Grade"]:
                 raise ValueError("Error: Invalid CSV format. Expected columns: Name, Grades, Average Grade.")
-            students.clear()
             # Clear MongoDB collection before importing
             students_collection.delete_many({})
             for row in reader:
@@ -140,7 +163,8 @@ def import_students_from_csv(students, filename="students_export.csv"):
                 grades = [int(g) for g in grades_str.split(", ") if g]
                 if not validate_grades(grades):
                     raise ValueError(f"Error: Invalid grades for {name}. Grades must be between 0 and 100.")
-                add_student(students, name, grades)
+                student = {"name": name, "grades": grades}
+                students_collection.insert_one(student)
     except FileNotFoundError:
         raise ValueError(f"Error: File {filename} not found.")
     except IOError:
@@ -184,11 +208,18 @@ def load_students(filename=os.getenv("DATA_PATH", "students.txt")):
 
 # Main program to load initial students
 def main():
+    # Clear the collection to reset the list
+    result = students_collection.delete_many({})
+    print(f"Cleared {result.deleted_count} documents from students collection")
+    # Add initial students
+    student = {"name": "Richard Smith", "grades": [85, 90, 95, 88]}
+    students_collection.insert_one(student)
+    student = {"name": "Alice Johnson", "grades": [90, 85, 92, 84]}
+    students_collection.insert_one(student)
+    student = {"name": "Mike Brown", "grades": [99, 86, 90]}
+    students_collection.insert_one(student)
     students = load_students()
-    if not students:
-        add_student(students, "Richard Smith", [85, 90, 95, 88])
-        add_student(students, "Alice Johnson", [90, 85, 92, 84])
-        add_student(students, "Mike Brown", [99, 86, 90])
+    print(f"Initial students added: {students}")
     return students
 
 # Run the program

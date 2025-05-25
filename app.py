@@ -40,9 +40,7 @@ def add_student():
     try:
         students = student_searcher.load_students()
         student_searcher.add_student(students, name, grades)
-        # Reload students to ensure the list is up-to-date
-        students = student_searcher.load_students()
-        print(f"Saved students after adding {name}:", students)
+        print(f"Added {name} successfully!")
         return jsonify({"message": f"Added {name} successfully!"}), 201
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
@@ -63,7 +61,7 @@ def update_grades(name):
             if not student_searcher.validate_grades(grades):
                 return jsonify({"error": "Grades must be between 0 and 100."}), 400
             student_searcher.update_grades(students, name, grades)
-            print(f"Saved students after editing {name}:", students)
+            print(f"Updated grades for {name} successfully!")
             return jsonify({"message": f"Updated grades for {name} successfully!"})
         except ValueError as e:
             return jsonify({"error": str(e)}), 400
@@ -78,7 +76,7 @@ def remove_student(name):
     student = student_searcher.search_student(students, name)
     if student:
         student_searcher.remove_student(students, name)
-        print(f"Saved students after removing {name}:", students)
+        print(f"Removed {name} successfully!")
         return jsonify({"message": f"Removed {name} successfully!"})
     return jsonify({"error": f"Student {name} not found."}), 404
 

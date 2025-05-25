@@ -1,3 +1,6 @@
+// Manage Page Component
+// Allows users to add, edit, and remove students.
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import StudentList from '../components/StudentList';
@@ -16,8 +19,10 @@ const Manage = () => {
     try {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/students`);
       setStudents(response.data);
+      console.log("Fetched students:", response.data); // Debug log
     } catch (err) {
       setError('Error fetching students.');
+      console.error("Fetch students error:", err); // Debug log
     }
   };
 
@@ -70,9 +75,12 @@ const Manage = () => {
       try {
         await axios.delete(`${process.env.REACT_APP_API_URL}/students/${name}`);
         setMessage(`Removed ${name} successfully!`);
-        fetchStudents();
+        setError(''); // Clear any previous errors
+        console.log(`Deleted ${name}, refetching students...`); // Debug log
+        await fetchStudents(); // Ensure the list is refreshed
       } catch (err) {
-        setError('Error removing student.');
+        setError(err.response?.data?.error || 'Error removing student.');
+        console.error('Delete error:', err.response?.data?.error); // Debug log
       }
     }
   };
@@ -87,7 +95,7 @@ const Manage = () => {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder= "e.g., First Last name"
+            placeholder="e.g., First Last name"
             required
           />
         </Form.Group>
