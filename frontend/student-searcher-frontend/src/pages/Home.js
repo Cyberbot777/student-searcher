@@ -9,32 +9,31 @@ import { Container, Alert, Spinner } from 'react-bootstrap';
 const Home = () => {
   const [students, setStudents] = useState([]);
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true); // Add loading state
+  const [loading, setLoading] = useState(true);
 
   const fetchStudents = async () => {
     try {
-      setLoading(true); // Start loading
+      setLoading(true);
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/students`);
       setStudents(response.data);
     } catch (err) {
       setError('Error fetching students.');
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchStudents();
-  }, []); // Empty dependency array ensures fetch only on mount, acting as cache
+  }, []);
 
   return (
     <Container>
       <h2 className="my-4">All Students</h2>
       {loading ? (
         <div className="text-center my-4">
-          <Spinner animation="border" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </Spinner>
+          <Spinner animation="border" role="status" />
+          <p>Loading student data...</p>
         </div>
       ) : (
         <>
